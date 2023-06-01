@@ -1,0 +1,160 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMsdkwmHDIu9iiOK+W95RUv",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/poonjijain/Web-scraping-to-data-visualization/blob/main/Web%20Scraping%20to%20data%20visualization\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**WEB SCRAPING TO DATA** **VISUALIZATION** "
+      ],
+      "metadata": {
+        "id": "VIzEVZbOq6VC"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "The code snippet provided showcases a web scraping task using the Python requests and BeautifulSoup libraries to extract data from multiple URLs related to various aspects of India's economic and social indicators. The extracted data is then stored in a Pandas DataFrame and exported to a CSV file.\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "lqFUhOt7rlbJ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "O7fHDrvenrlZ"
+      },
+      "outputs": [],
+      "source": [
+        "import requests\n",
+        "import pandas as pd\n",
+        "from bs4 import BeautifulSoup \n"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "\n",
+        "\n",
+        "> \n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "S2dpXngen1dI"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "url = [\"https://www.macrotrends.net/countries/IND/india/population\", \"https://www.macrotrends.net/countries/IND/india/gdp-gross-domestic-product\",\"https://www.macrotrends.net/countries/IND/india/economic-growth-rate\",\"https://www.macrotrends.net/countries/IND/india/unemployment-rate\",\"https://www.macrotrends.net/countries/IND/india/youth-unemployment-rate\"]\n",
+        "file=open(\"output.csv\",\"w\")"
+      ],
+      "metadata": {
+        "id": "vqQzW0-qnyfn"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "The data_fetch function serves as the heart of this web scraping solution. It operates by taking a list of URLs as input and systematically processing each URL to extract the desired data. Here's a breakdown of how it works:\n",
+        "\n",
+        "Retrieving the Information: The function initiates a GET request to each URL, allowing access to the HTML content of the respective web page. With the help of BeautifulSoup, the HTML content is parsed and structured for convenient data extraction.\n",
+        "\n",
+        "Extracting Data from Tables: The function identifies the relevant table within the HTML structure by utilizing a specific class name. It then proceeds to iterate through each table row (<tr>) within the table, extracting the data from the table cells (<td>) associated with the desired metrics.\n",
+        "\n",
+        "Compiling the Data: As the data is extracted, it is stored in a row list, which is structured to capture the information from each URL in a tabular format. The rows represent individual URLs, while the columns correspond to the specific data points extracted from the tables.\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "JYeYalF5sCHZ"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def data_fetch(url):\n",
+        "\n",
+        "    for i in url:\n",
+        "        row=[]\n",
+        "        \n",
+        "        response1 = requests.get(str(i)).text\n",
+        "        soup1 = BeautifulSoup(response1, \"html.parser\")\n",
+        "        content_divs1 = soup1.find_all(\"table\", class_=\"historical_data_table table table-striped table-bordered\")[1]\n",
+        "        colspan_element = content_divs1.find(\"th\", colspan=\"3\")\n",
+        "        if colspan_element is not None:\n",
+        "          row.append(colspan_element.text)\n",
+        "        else:\n",
+        "          row.append(\"N/A\")\n",
+        "        for tr in content_divs1.find_all(\"tr\"):\n",
+        "            row1=[k.text.strip() for k in (tr.find_all(\"td\"))]\n",
+        "            row.append(row1)\n",
+        "        p=pd.DataFrame(row)\n",
+        "    \n",
+        "        p.to_csv(file,index=False)\n"
+      ],
+      "metadata": {
+        "id": "Iow3G8qYnzMw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Data Representation and Export: Once the data retrieval process is complete, the row list is transformed into a Pandas DataFrame. This tabular representation allows for easy visualization, manipulation, and analysis of the collected data. Additionally, the DataFrame is printed to the console, providing a quick overview of the extracted information. The data is also exported to a CSV file named \"output.csv\" for future reference and utilization.\n",
+        "\n",
+        "In summary, this web scraping solution streamlines the process of gathering data related to India's population, GDP, economic growth rate, unemployment rate, and youth unemployment rate. By automating the data extraction from multiple URLs, it saves time and effort while ensuring the availability of comprehensive and up-to-date information. This collected data can be further analyzed, visualized, and used to gain insights into India's socioeconomic landscape, aiding decision-making processes across various domains.\n"
+      ],
+      "metadata": {
+        "id": "Ls-qQqq5sgI0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data_fetch(url)"
+      ],
+      "metadata": {
+        "id": "P1WeOB7XnzT_"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
